@@ -29,6 +29,13 @@ module Winston
       true
     end
 
+    def domain_for(variable_name)
+      variable = variables[variable_name]
+      return [] if variable.nil? || variable.domain.nil?
+
+      variable.domain.values
+    end
+
     private
 
     def var_assignments

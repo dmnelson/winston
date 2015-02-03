@@ -34,7 +34,7 @@ module Winston
     end
 
     def domain_values(var)
-      csp.variables[var.name].domain.values
+      csp.domain_for(var.name)
     end
   end
 end

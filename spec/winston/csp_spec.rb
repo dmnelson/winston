@@ -60,6 +60,25 @@ describe Winston::CSP do
     end
   end
 
+  describe "#domain_for" do
+    before do
+      subject.add_variable :a, value: 1
+      subject.add_variable :b, domain: [1, 2]
+    end
+
+    it "returns domain values for a given variable" do
+      expect(subject.domain_for(:b)).to eq([1, 2])
+    end
+
+    it "returns an empty list when a variable doesn't exist in the problem" do
+      expect(subject.domain_for(:c)).to be_empty
+    end
+
+    it "return an empty list when a variable doesn't have a domain" do
+      expect(subject.domain_for(:a)).to be_empty
+    end
+  end
+
   describe "#solve" do
     let(:solver) { double("Solver") }
     before do
