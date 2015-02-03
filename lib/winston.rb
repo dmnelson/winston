@@ -5,3 +5,4 @@ require 'winston/backtrack'
 require 'winston/csp'
 
 require 'winston/constraints/all_different'
+require 'winston/constraints/not_in_list'
