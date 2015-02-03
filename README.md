@@ -5,6 +5,8 @@ It provides a useful way to solve problems like resource allocation or planning 
 
 The most common example of usage for CSPs is probably the game [Sudoku](http://en.wikipedia.org/wiki/Sudoku).
 
+[![Gem Version](https://badge.fury.io/rb/winston.svg)](http://badge.fury.io/rb/winston) [![Build Status](https://travis-ci.org/dmnelson/winston.svg)](https://travis-ci.org/dmnelson/winston) [![Code Climate](https://codeclimate.com/github/dmnelson/winston/badges/gpa.svg)](https://codeclimate.com/github/dmnelson/winston)
+
 ## Installation
 
 Add this line to your application's Gemfile:
