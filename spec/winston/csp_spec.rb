@@ -28,7 +28,7 @@ describe Winston::CSP do
   describe "#add_constraint" do
     let(:constraint) { double("Constraint") }
     it "should build a constraint for the given block" do
-      expect(Winston::Constraint).to receive(:new).with([:a, :b], an_instance_of(Proc)).once.and_return(constraint)
+      expect(Winston::Constraint).to receive(:new).with(variables: [:a, :b], allow_nil: false, predicate: an_instance_of(Proc)).once.and_return(constraint)
       subject.add_constraint(:a, :b) { true }
       expect(subject.constraints).to include(constraint)
     end

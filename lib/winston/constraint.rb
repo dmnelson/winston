@@ -1,11 +1,12 @@
 module Winston
   class Constraint
 
-    attr_reader :variables, :predicate, :global
+    attr_reader :variables, :predicate, :allow_nil, :global
 
-    def initialize(variables = nil, predicate = nil)
+    def initialize(variables: nil, predicate: nil, allow_nil: false)
       @variables = variables || []
       @predicate = predicate
+      @allow_nil = allow_nil
       @global = @variables.empty?
     end
 
@@ -25,7 +26,7 @@ module Winston
     end
 
     def has_required_values?(assignments)
-      variables.all? { |v| assignments.key?(v) }
+      allow_nil || variables.all? { |v| assignments.key?(v) }
     end
   end
 end
