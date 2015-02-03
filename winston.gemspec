@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name        = 'winston'
-  gem.version     = '0.0.1'
+  gem.version     = '0.0.2'
   gem.authors     = ['David Michael Nelson']
   gem.homepage    = 'http://github.com/dmnelson/winston'
 
