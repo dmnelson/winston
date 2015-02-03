@@ -4,7 +4,7 @@ module Winston
     attr_reader :variables, :predicate, :allow_nil, :global
 
     def initialize(variables: nil, predicate: nil, allow_nil: false)
-      @variables = variables || []
+      @variables = [variables].flatten.compact
       @predicate = predicate
       @allow_nil = allow_nil
       @global = @variables.empty?

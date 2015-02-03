@@ -18,7 +18,7 @@ module Winston
     end
 
     def add_constraint(*variables, constraint: nil, allow_nil: false, &block)
-      constraint ||= Constraint.new(variables: [variables].flatten.compact, allow_nil: allow_nil, predicate: block)
+      constraint ||= Constraint.new(variables: variables, allow_nil: allow_nil, predicate: block)
       constraints << constraint
     end
 
