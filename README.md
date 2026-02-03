@@ -1,7 +1,7 @@
 # Winston
 
 [Constraint Satisfaction Problem](http://en.wikipedia.org/wiki/Constraint_satisfaction_problem) (CSP) implementation for Ruby. 
-It provides a useful way to solve problems like resource allocation or planning though a set of constraints.
+It provides a useful way to solve problems like resource allocation or planning through a set of constraints.
 
 The most common example of usage for CSPs is probably the game [Sudoku](http://en.wikipedia.org/wiki/Sudoku).
 
@@ -24,7 +24,7 @@ Or install it yourself as:
 ## Usage
 
 The problem consists of three sets of information: Domain, Variables and Constraints. It will try to determine a value
-from the given domain for each variable that will attend all the constraints. 
+from the given domain for each variable that will satisfy all the constraints.
 
 ```ruby
 require 'winston'
@@ -100,6 +100,12 @@ csp.solve(solver)
 ```
 
 MAC is complete and usually faster than plain backtracking on constrained problems, but can be slower on very small ones.
+
+#### Solver selection guide
+
+- Use `:backtrack` for small problems or when you want deterministic depth-first search.
+- Use `:mac` for tighter constraints or when backtracking explores too many dead ends.
+- Use `:min_conflicts` for large problems where you want speed and can tolerate incompleteness.
 
 ### DSL
 
@@ -208,7 +214,8 @@ it, but it will take those values into account for validating the constraints.
 csp.add_variable "my_var", value: "predefined value"
 ```
 
-And it's also possible to set the domain as `Proc` so it'd be evaluated on-demand.
+And it's also possible to set the domain as `Proc` so it'd be evaluated on-demand. Domains are static and do not
+receive partial assignments; use constraints for dynamic behavior.
 
 ```ruby
 csp.add_variable("other_var") { |var_name, csp| [:a, :b, :c ] } 
@@ -218,8 +225,8 @@ csp.add_variable("other_var", domain: proc { |var_name, csp| [:a, :b, :c ] })
 
 ### Constraints
 
-Constraints can be set for specific variables and would be evaluated only when all those variables are set and one
-of them has changed; Or globals, in which case, they'd evaluated for every assignment.
+Constraints can be set for specific variables and are evaluated based on the active solver strategy. Global
+constraints are evaluated for every assignment; some solvers (like MAC) also use constraints to prune domains.
 
 ```ruby
 csp.add_constraint(:a) { |a| a > 0 } # positive value
@@ -239,7 +246,7 @@ csp.add_constraint do |assignments|
 end
 ```
 
-Constraint can be also set as their own objects, that's great for reusability.
+Constraints can also be set as their own objects, which is great for reusability.
 
 ```ruby
 csp.add_constraint constraint: MyConstraint.new(...)
@@ -247,7 +254,7 @@ csp.add_constraint constraint: MyConstraint.new(...)
 csp.add_constraint constraint: Winston::Constraints::AllDifferent.new # built-in constraint, checks if all values are different from each other
 ```
 
-### Problems without solution
+### Problems without a solution
 
 ```ruby
 require 'winston'
@@ -265,18 +272,19 @@ csp.solve
 ```
 
 **IMPORTANT NOTE: Depending on the number of variables and the size of the domain it can take a long time to test all different possibilities.
-In that case it'll be recomendable to use of ways to reduce the number of iterations, for example, removing an item from a shared domain
-when it is tested ( A `queue` type of structure, that would `pop` the value on the `each` block).**
+In that case it's recommended to use heuristics or stronger solvers like MAC to reduce the number of iterations.**
 
 ### More examples
 
 Check the folder `spec/examples` for more usage examples.
-The `spec/examples/map_coloring_spec.rb` example is a good starting point for small graph problems.
+The `spec/examples/map_coloring_spec.rb` example is a good starting point for small graph problems, and it demonstrates
+using the MAC solver via `csp.solve(:mac, ...)`.
 
 ## TODOs / Nice-to-haves
 
-- Currently only algorithm to solve the CSP is Backtracking, implement other like Local search, Constraint propagation, ...
-- Add constraint propagation and other inference techniques
+- Add more named constraints (sum, all_equal, in_range, ...)
+- Add additional inference techniques (backjumping, nogood recording, ...)
+- Add more solver examples and benchmarks
 
 ## Contributing
 
