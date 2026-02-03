@@ -9,7 +9,10 @@ module Winston
     end
 
     def solve(solver = Backtrack.new(self))
-      solver.search(var_assignments)
+      initial = var_assignments
+      return false unless validate_initial_assignments(initial)
+
+      solver.search(initial)
     end
 
     def add_variable(name, value: nil, domain: nil, &block)
@@ -42,6 +45,15 @@ module Winston
       @variables.reduce({}) do |assignments, (name, variable)|
         assignments[name] = variable.value unless variable.value.nil?
         assignments
+      end
+    end
+
+    def validate_initial_assignments(assignments)
+      constraints.all? do |constraint|
+        next constraint.validate(assignments) if constraint.global || constraint.allow_nil
+        next true unless constraint.variables.all? { |v| assignments.key?(v) }
+
+        constraint.validate(assignments)
       end
     end
   end

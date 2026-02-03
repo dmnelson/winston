@@ -80,7 +80,7 @@ end
 # hash with all current assignments
 
 csp.add_constraint do |assignments|
-  assignmets.values.uniq.size == assignments.keys.size # checks if every value is unique
+  assignments.values.uniq.size == assignments.keys.size # checks if every value is unique
 end
 ```
 
@@ -115,7 +115,7 @@ when it is tested ( A `queue` type of structure, that would `pop` the value on t
 
 ### More examples
 
-Check the folder `specs/examples` for more usage examples.
+Check the folder `spec/examples` for more usage examples.
 
 ## TODOs / Nice-to-haves
 

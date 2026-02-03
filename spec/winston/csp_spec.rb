@@ -87,8 +87,21 @@ describe Winston::CSP do
     end
 
     it "should pass a collection of preset variables to the solver" do
-      expect(solver).to receive(:search).with(a: 1)
+      expect(solver).to receive(:search).with({ a: 1 })
       subject.solve(solver)
+    end
+
+    it "returns false when preset assignments violate a constraint" do
+      subject.add_constraint(:a) { |a| a > 2 }
+      expect(solver).to_not receive(:search)
+      expect(subject.solve(solver)).to be(false)
+    end
+
+    it "returns false when a constraint among preset variables is violated" do
+      subject.add_variable :c, value: 2
+      subject.add_constraint(:a, :c) { |a, c| a == c }
+      expect(solver).to_not receive(:search)
+      expect(subject.solve(solver)).to be(false)
     end
   end
 end
