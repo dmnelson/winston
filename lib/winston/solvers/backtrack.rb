@@ -1,5 +1,6 @@
 module Winston
-  class Backtrack
+  module Solvers
+    class Backtrack
     def initialize(csp, variable_strategy: :first, value_strategy: :in_order, forward_checking: false)
       @csp = csp
       @variable_strategy = variable_strategy
@@ -83,5 +84,8 @@ module Winston
         end
       end
     end
+    end
   end
+
+  Backtrack = Solvers::Backtrack
 end

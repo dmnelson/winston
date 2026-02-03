@@ -8,7 +8,7 @@ module Winston
       @constraints = []
     end
 
-    def solve(solver = Backtrack.new(self))
+    def solve(solver = Solvers::Backtrack.new(self))
       initial = var_assignments
       return false unless validate_initial_assignments(initial)
 

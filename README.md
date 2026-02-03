@@ -49,7 +49,7 @@ csp.solve
 The default solver is backtracking, and you can configure it with heuristics to speed up search on harder problems.
 
 ```ruby
-solver = Winston::Backtrack.new(
+solver = Winston::Solvers::Backtrack.new(
   csp,
   variable_strategy: :mrv,
   value_strategy: :lcv,
@@ -65,7 +65,7 @@ You can also pass your own strategies as lambdas:
 custom_var = ->(vars, assignments, csp) { vars.first }
 custom_val = ->(values, var, assignments, csp) { values.reverse }
 
-solver = Winston::Backtrack.new(
+solver = Winston::Solvers::Backtrack.new(
   csp,
   variable_strategy: custom_var,
   value_strategy: custom_val
@@ -75,13 +75,22 @@ solver = Winston::Backtrack.new(
 Built-in heuristic helpers are also available:
 
 ```ruby
-solver = Winston::Backtrack.new(
+solver = Winston::Solvers::Backtrack.new(
   csp,
   variable_strategy: Winston::Heuristics.mrv,
   value_strategy: Winston::Heuristics.lcv,
   forward_checking: Winston::Heuristics.forward_checking
 )
 ```
+
+You can also use a local-search solver (min-conflicts), which is often fast on large problems:
+
+```ruby
+solver = Winston::Solvers::MinConflicts.new(csp, max_steps: 10_000)
+csp.solve(solver)
+```
+
+Min-conflicts is not complete, so it may return `false` even if a solution exists.
 
 ### DSL
 

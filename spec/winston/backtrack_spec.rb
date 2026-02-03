@@ -1,6 +1,6 @@
 require "winston"
 
-describe Winston::Backtrack do
+describe Winston::Solvers::Backtrack do
   let(:csp) { Winston::CSP.new }
   subject { described_class.new(csp) }
 
