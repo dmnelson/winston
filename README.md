@@ -44,6 +44,45 @@ csp.solve
 = { a: 6, b: 4, c: 3 }
 ```
 
+### Solvers and heuristics
+
+The default solver is backtracking, and you can configure it with heuristics to speed up search on harder problems.
+
+```ruby
+solver = Winston::Backtrack.new(
+  csp,
+  variable_strategy: :mrv,
+  value_strategy: :lcv,
+  forward_checking: true
+)
+
+csp.solve(solver)
+```
+
+You can also pass your own strategies as lambdas:
+
+```ruby
+custom_var = ->(vars, assignments, csp) { vars.first }
+custom_val = ->(values, var, assignments, csp) { values.reverse }
+
+solver = Winston::Backtrack.new(
+  csp,
+  variable_strategy: custom_var,
+  value_strategy: custom_val
+)
+```
+
+Built-in heuristic helpers are also available:
+
+```ruby
+solver = Winston::Backtrack.new(
+  csp,
+  variable_strategy: Winston::Heuristics.mrv,
+  value_strategy: Winston::Heuristics.lcv,
+  forward_checking: Winston::Heuristics.forward_checking
+)
+```
+
 ### Variables and Domain
 
 It's possible to preset values for variables, and in that case the problem would not try to determine values for
@@ -121,7 +160,7 @@ Check the folder `spec/examples` for more usage examples.
 
 - Create a DSL for setting up the problem
 - Currently only algorithm to solve the CSP is Backtracking, implement other like Local search, Constraint propagation, ...
-- Implement heuristics to improve search time (least constraining value, minimum remaining values,...)
+- Add constraint propagation and other inference techniques
 
 ## Contributing
 

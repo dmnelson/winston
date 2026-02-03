@@ -44,5 +44,38 @@ describe Winston::Backtrack do
         end
       end
     end
+
+    context "with heuristics" do
+      it "uses MRV to pick the smallest remaining domain first" do
+        csp.add_variable :a, domain: [1, 2, 3]
+        csp.add_variable :b, domain: [1]
+        csp.add_variable :c, domain: [1, 2]
+
+        solver = described_class.new(csp, variable_strategy: :mrv)
+        result = solver.search
+
+        expect(result.keys).to eq([:b, :c, :a])
+      end
+
+      it "uses LCV to prefer values that leave more options" do
+        csp.add_variable :a, domain: [2, 1]
+        csp.add_variable :b, domain: [2, 3]
+        csp.add_constraint(:a, :b) { |a, b| b > a }
+
+        solver = described_class.new(csp, value_strategy: :lcv)
+        result = solver.search
+
+        expect(result[:a]).to eq(1)
+      end
+
+      it "supports forward checking" do
+        csp.add_variable :a, domain: [1]
+        csp.add_variable :b, domain: [1]
+        csp.add_constraint(:a, :b) { |a, b| a != b }
+
+        solver = described_class.new(csp, forward_checking: true)
+        expect(solver.search).to be(false)
+      end
+    end
   end
 end
