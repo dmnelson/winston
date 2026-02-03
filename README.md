@@ -83,6 +83,91 @@ solver = Winston::Backtrack.new(
 )
 ```
 
+### DSL
+
+You can build problems using a small DSL:
+
+```ruby
+csp = Winston.define do
+  domain :digits, (1..9).to_a
+
+  var :a, domain: :digits
+  var :b, domain: :digits
+  var :c, domain: :digits
+
+  constraint(:a, :c) { |a, c| a == c * 2 }
+  constraint(:a, :b) { |a, b| a > b }
+  constraint(:b, :c) { |b, c| b > c }
+  constraint(:b) { |b| b.even? }
+end
+
+csp.solve
+```
+
+#### DSL Reference
+
+`Winston.define { ... }` builds and returns a `Winston::CSP`.
+
+DSL methods:
+- `domain :name, values` registers a named domain.
+- `var :name, domain: <values or :name>, value: <preset>, &block` adds a variable.
+- `constraint(*vars, allow_nil: false) { |*values, assignments| ... }` adds a custom constraint.
+- `use_constraint :name, *vars, allow_nil: false, **options` adds a named constraint.
+
+Notes:
+- Domains are static. Use constraints for dynamic behavior.
+- `value:` presets a variable and is validated before search starts.
+- `allow_nil: true` lets a constraint run even if some variables are unset.
+
+#### Named Domains
+
+Named domains reduce repetition and keep variable declarations clean:
+
+```ruby
+Winston.define do
+  domain :digits, (1..9).to_a
+  var :a, domain: :digits
+  var :b, domain: :digits
+end
+```
+
+#### Named Constraints
+
+Built-in named constraints:
+- `:all_different`
+- `:not_in_list`
+
+```ruby
+Winston.define do
+  var :a, domain: [1, 2]
+  var :b, domain: [1, 2]
+  use_constraint :all_different, :a, :b
+end
+```
+
+Register custom constraints:
+
+```ruby
+Winston.register_constraint(:all_twos) do |variables, allow_nil, **_options|
+  Class.new(Winston::Constraint) do
+    def validate(assignments)
+      values = values_at(assignments)
+      values.all? { |v| v == 2 }
+    end
+  end.new(variables: variables, allow_nil: allow_nil)
+end
+```
+
+Use them in the DSL:
+
+```ruby
+Winston.define do
+  var :a, domain: [1, 2]
+  var :b, domain: [1, 2]
+  use_constraint :all_twos, :a, :b
+end
+```
+
 ### Variables and Domain
 
 It's possible to preset values for variables, and in that case the problem would not try to determine values for
@@ -155,10 +240,10 @@ when it is tested ( A `queue` type of structure, that would `pop` the value on t
 ### More examples
 
 Check the folder `spec/examples` for more usage examples.
+The `spec/examples/map_coloring_spec.rb` example is a good starting point for small graph problems.
 
 ## TODOs / Nice-to-haves
 
-- Create a DSL for setting up the problem
 - Currently only algorithm to solve the CSP is Backtracking, implement other like Local search, Constraint propagation, ...
 - Add constraint propagation and other inference techniques
 
