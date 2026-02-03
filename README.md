@@ -280,6 +280,17 @@ Check the folder `spec/examples` for more usage examples.
 The `spec/examples/map_coloring_spec.rb` example is a good starting point for small graph problems, and it demonstrates
 using the MAC solver via `csp.solve(:mac, ...)`.
 
+### Benchmarks
+
+Run benchmarks with:
+
+```ruby
+rake bench
+```
+
+The benchmarks live in `bench/run.rb` and compare backtracking, MAC, and min-conflicts on a few sample problems.
+Benchmarks are run with a fixed timeout and number of runs to make results comparable.
+
 ## TODOs / Nice-to-haves
 
 - Add more named constraints (sum, all_equal, in_range, ...)

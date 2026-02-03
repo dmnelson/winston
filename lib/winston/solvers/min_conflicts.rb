@@ -5,6 +5,7 @@ module Winston
       @csp = csp
       @max_steps = max_steps
       @random = random
+      @constraints_for_var = build_constraints_for_var
     end
 
     def search(assignments = {})
@@ -13,15 +14,23 @@ module Winston
       return false if preset.nil?
 
       current = preset
+      @constraint_status = {}
+      @total_conflicts = 0
+      csp.constraints.each do |constraint|
+        valid = constraint.validate(current)
+        @constraint_status[constraint] = valid
+        @total_conflicts += 1 unless valid
+      end
 
       max_steps.times do
-        return current if total_conflicts(current).zero?
+        return current if total_conflicts.zero?
 
         conflicted = conflicted_variables(current)
         return false if conflicted.empty?
 
         var = conflicted[random.rand(conflicted.size)]
         current[var.name] = best_value_for(var, current)
+        update_conflicts_for(var, current)
       end
 
       false
@@ -29,7 +38,7 @@ module Winston
 
     private
 
-    attr_reader :csp, :max_steps, :random, :fixed_names
+    attr_reader :csp, :max_steps, :random, :fixed_names, :constraints_for_var
 
     def preset_assignments(assignments)
       preset = {}
@@ -45,8 +54,8 @@ module Winston
       preset
     end
 
-    def total_conflicts(assignments)
-      csp.constraints.count { |constraint| !constraint.validate(assignments) }
+    def total_conflicts
+      @total_conflicts
     end
 
     def conflicted_variables(assignments)
@@ -60,9 +69,8 @@ module Winston
     end
 
     def conflicts_for(var, assignments)
-      csp.constraints.count do |constraint|
-        affects_var = constraint.global || constraint.variables.include?(var.name)
-        affects_var && !constraint.validate(assignments)
+      constraints_for_var[var.name].count do |constraint|
+        !constraint.validate(assignments)
       end
     end
 
@@ -84,8 +92,34 @@ module Winston
       end
       fixed.uniq
     end
+
+    def update_conflicts_for(var, assignments)
+      constraints_for_var[var.name].each do |constraint|
+        previous = @constraint_status[constraint]
+        current = constraint.validate(assignments)
+        next if previous == current
+
+        @constraint_status[constraint] = current
+        @total_conflicts += current ? -1 : 1
+      end
+    end
+
+    def build_constraints_for_var
+      map = Hash.new { |h, k| h[k] = [] }
+      csp.variables.each_key { |name| map[name] = [] }
+
+      csp.constraints.each do |constraint|
+        if constraint.global
+          csp.variables.each_key { |name| map[name] << constraint }
+        else
+          constraint.variables.each { |name| map[name] << constraint }
+        end
+      end
+
+      map
     end
   end
+end
 
   MinConflicts = Solvers::MinConflicts
 end

@@ -5,3 +5,8 @@ task :default do
   RSpec::Core::RakeTask.new(:spec)
   Rake::Task["spec"].execute
 end
+
+desc "Run benchmarks"
+task :bench do
+  ruby "bench/run.rb"
+end
