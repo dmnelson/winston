@@ -8,11 +8,12 @@ module Winston
       @constraints = []
     end
 
-    def solve(solver = Solvers::Backtrack.new(self))
+    def solve(solver = nil, **options)
       initial = var_assignments
       return false unless validate_initial_assignments(initial)
 
-      solver.search(initial)
+      solver_instance = build_solver(solver, options)
+      solver_instance.search(initial)
     end
 
     def add_variable(name, value: nil, domain: nil, &block)
@@ -45,6 +46,21 @@ module Winston
       @variables.reduce({}) do |assignments, (name, variable)|
         assignments[name] = variable.value unless variable.value.nil?
         assignments
+      end
+    end
+
+    def build_solver(solver, options)
+      return solver if solver && !solver.is_a?(Symbol)
+
+      case solver
+      when nil, :backtrack
+        Solvers::Backtrack.new(self, **options)
+      when :mac
+        Solvers::MAC.new(self, **options)
+      when :min_conflicts
+        Solvers::MinConflicts.new(self, **options)
+      else
+        raise ArgumentError, "Unknown solver :#{solver}"
       end
     end
 

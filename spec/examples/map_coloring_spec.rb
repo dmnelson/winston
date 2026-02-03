@@ -24,7 +24,7 @@ describe "Map coloring example" do
       constraint(:new_south_wales, :victoria) { |nsw, v| nsw != v }
     end
 
-    solution = csp.solve
+    solution = csp.solve(:mac, variable_strategy: :mrv)
 
     expect(solution).to include(
       :western_australia,

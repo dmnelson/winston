@@ -92,6 +92,15 @@ csp.solve(solver)
 
 Min-conflicts is not complete, so it may return `false` even if a solution exists.
 
+For stronger pruning, you can use MAC (Maintaining Arc Consistency), which enforces arc consistency during search:
+
+```ruby
+solver = Winston::Solvers::MAC.new(csp, variable_strategy: :mrv, value_strategy: :lcv)
+csp.solve(solver)
+```
+
+MAC is complete and usually faster than plain backtracking on constrained problems, but can be slower on very small ones.
+
 ### DSL
 
 You can build problems using a small DSL:
@@ -112,6 +121,19 @@ end
 
 csp.solve
 ```
+
+You can select a solver by name from any CSP instance:
+
+```ruby
+csp.solve(:backtrack, variable_strategy: :mrv)
+csp.solve(:mac, value_strategy: :lcv)
+csp.solve(:min_conflicts, max_steps: 10_000)
+```
+
+Named solvers:
+- `:backtrack`
+- `:mac`
+- `:min_conflicts`
 
 #### DSL Reference
 

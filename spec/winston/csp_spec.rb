@@ -91,6 +91,17 @@ describe Winston::CSP do
       subject.solve(solver)
     end
 
+    it "builds a solver by name with options" do
+      subject.add_constraint(:a, :b) { |a, b| a < b }
+      result = subject.solve(:backtrack, variable_strategy: :mrv)
+
+      expect(result).to eq({ a: 1, b: 2 })
+    end
+
+    it "raises for an unknown solver name" do
+      expect { subject.solve(:unknown) }.to raise_error(ArgumentError, /Unknown solver/)
+    end
+
     it "returns false when preset assignments violate a constraint" do
       subject.add_constraint(:a) { |a| a > 2 }
       expect(solver).to_not receive(:search)
